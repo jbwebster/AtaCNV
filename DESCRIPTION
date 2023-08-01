@@ -2,8 +2,8 @@ Package: AtaCNV
 Type: Package
 Title: AtaCNV
 Version: 0.1.0
-Author: Aelita
-Maintainer: xcwang1998@pku.edu.cn
+Author: Xiaochen Wang
+Maintainer: <xcwang1998@pku.edu.cn>
 Description: R package for paper "Detecting copy number variations from single-cell chromatin accessibility sequencing data by AtaCNV".
 License: MIT + file LICENSE
 Encoding: UTF-8
