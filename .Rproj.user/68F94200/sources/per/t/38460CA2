@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1689840752681.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3884288339",
+    "id" : "38460CA2",
+    "lastKnownWriteTime" : 1689167011,
+    "last_content_update" : 1689167011,
+    "path" : "E:/AtaCNV/R/generate_input.R",
+    "project_path" : "R/generate_input.R",
+    "properties" : {
+        "cursorPosition" : "16,18",
+        "scrollLine" : "4"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

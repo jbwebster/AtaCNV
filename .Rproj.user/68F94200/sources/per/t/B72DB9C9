@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1689842622989.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2077299134",
+    "id" : "B72DB9C9",
+    "lastKnownWriteTime" : 1689167590,
+    "last_content_update" : 1689167590,
+    "path" : "E:/AtaCNV/R/downstream.R",
+    "project_path" : "R/downstream.R",
+    "properties" : {
+        "cursorPosition" : "14,10",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
