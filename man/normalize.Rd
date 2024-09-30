@@ -23,8 +23,9 @@ normalize(
   use_max_cor_cluster = F,
   thre_ncell = 30,
   cutoff = 3,
+  gc_correction = TRUE,
   output_dir = "./",
-  output_name = "norm_result.rds"
+  output_name = "none"
 )
 }
 \arguments{
@@ -88,21 +89,22 @@ Only used when \code{mode} is set to "matched normal sample" or "none".}
 \item{cutoff}{a real number. Copy ratios larger than this value will be set to
 it.}
 
+\item{gc_correction}{logical, indicating whether to apply cell-wise GC
+correction through local regression.}
+
 \item{output_dir}{output directory}
 
-\item{output_name}{output file name, should be ".rds"}
+\item{output_name}{output file name, should be ".rds". If equals to
+"none", the result will not be saved to disk.}
 }
 \value{
 Return a list of the following objects:
 \itemize{
 \item "norm_count": a cell-by-bin normalized read count matrix.
 \item "baseline": a vector. Read count baseline of normal cells.
-\item "copy_ratio": a cell-by-bin copy ratio matrix without segmentation.
+\item "copy_ratio": a cell-by-bin copy ratio matrix before segmentation.
 }
 }
 \description{
 Normalize read count matrix and de-convolute coy ratio signals
-}
-\examples{
-
 }

@@ -38,6 +38,3 @@ results?}
 \description{
 Arm-level CNV
 }
-\examples{
-
-}

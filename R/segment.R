@@ -20,7 +20,7 @@
 #'
 #' @return Return a list of the following objects:
 #' \itemize{
-#' \item "CNV": a cell-by-bin copy ratio matrix.
+#' \item "copy_ratio": a cell-by-bin copy ratio matrix.
 #' \item "bkp": breakpoint positions.
 #' \item "CNV_seg": a cell-by-segment copy ratio matrix.
 #' @export
@@ -134,9 +134,11 @@ calculate_CNV <- function(norm_count,
 
   ## save results
   print("Step 2: saving results...")
-  CNV <- round(CNV, digit=3)
-  result <- list(CNV=CNV, bkp=bkp, CNV_seg=CNV_re)
-  saveRDS(result, file=paste0(output_dir, output_name))
+  CNV <- round(CNV, digit = 3)
+  result <- list(copy_ratio = CNV,
+                 bkp = bkp,
+                 CNV_seg = CNV_re)
+  saveRDS(result, file = paste0(output_dir, output_name))
   return(result)
 }
 
@@ -155,9 +157,8 @@ calculate_CNV <- function(norm_count,
 #'
 #' @return Return a list of the following objects:
 #' \itemize{
-#' \item "CNV": a cell-by-bin copy ratio matrix.
+#' \item "copy_ratio": a cell-by-bin copy ratio matrix.
 #' \item "bkp": breakpoint positions.
-#' \item "CNV_seg": a cell-by-segment copy ratio matrix.
 #' @export
 #'
 #' @examples
@@ -220,8 +221,9 @@ calculate_CNV_arm_level <- function(norm_count,
   }
 
   ## save results
-  result <- list(CNV=CNV_re, bkp=bkp)
-  saveRDS(result, file=paste0(output_dir, output_name))
+  result <- list(copy_ratio = CNV_re,
+                 bkp = bkp)
+  saveRDS(result, file = paste0(output_dir, output_name))
   return(result)
 }
 
@@ -246,3 +248,4 @@ smooth_CNV <- function(CNV){
   rownames(smooth_CNV) <- rownames(CNV)
   return(smooth_CNV)
 }
+

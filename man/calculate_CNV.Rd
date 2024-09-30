@@ -49,6 +49,3 @@ The generated temporary files will also be output to this directory.}
 \description{
 Determine CNV breakpoints by BICseq2 and output single cell copy ratio profile
 }
-\examples{
-
-}

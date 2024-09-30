@@ -39,6 +39,8 @@ CNV_score <- function(copy_ratio, cluster, delXY=T){
 #' @param cell_annotation a vector of cell annotations to be shown on the left
 #' side of heat map, or "none".
 #' @param save_hc logical, whether to save hierarchical clustering result?
+#' @param add_noise logical. If TRUE, add random noise to copy ratio to
+#' avoid clustering error.
 #' @param output_dir output directory
 #' @param output_name output image name, should be ".png" or ".pdf"
 #'
@@ -53,6 +55,7 @@ plot_heatmap <- function(copy_ratio,
                          cluster_method="kmeans", K=5,
                          cell_annotation="none",
                          save_hc=F,
+                         add_noise=T,
                          output_dir="./",
                          output_name="copy_ratio.png"
 ){
@@ -67,6 +70,13 @@ plot_heatmap <- function(copy_ratio,
     bins <- bins[f,]
   }
   chr_bkp <- bin2chrbkp(bins)
+
+  if(add_noise){
+    noise <- matrix(rnorm(n = length(copy_ratio), mean = 0, sd = 0.005),
+                    nrow = nrow(copy_ratio),
+                    ncol = ncol(copy_ratio))
+    copy_ratio <- copy_ratio + noise
+  }
 
   ## cluster
   print("Step 1: clustering...")

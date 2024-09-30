@@ -12,6 +12,7 @@ plot_heatmap(
   K = 5,
   cell_annotation = "none",
   save_hc = F,
+  add_noise = T,
   output_dir = "./",
   output_name = "copy_ratio.png"
 )
@@ -34,12 +35,12 @@ side of heat map, or "none".}
 
 \item{save_hc}{logical, whether to save hierarchical clustering result?}
 
+\item{add_noise}{logical. If TRUE, add random noise to copy ratio to
+avoid clustering error.}
+
 \item{output_dir}{output directory}
 
 \item{output_name}{output image name, should be ".png" or ".pdf"}
-}
-\value{
-
 }
 \description{
 Plot CNV heatmap using ComplexHeatmap

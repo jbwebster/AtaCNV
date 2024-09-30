@@ -42,31 +42,40 @@
 #' @param use_max_cor_cluster logical, indicating whether to select only cluster
 #' with the highest similarity or all clusters with higher similarities than
 #' \code{thre_correlation}.
+#' @param gc_correction logical, indicating whether to apply cell-wise GC
+#' correction through local regression.
 #' @param cutoff a real number. Copy ratios larger than this value will be set to
 #' it.
 #' @param output_dir output directory
-#' @param output_name output file name, should be ".rds"
+#' @param output_name output file name, should be ".rds". If equals to
+#' "none", the result will not be saved to disk.
 #'
 #' @return Return a list of the following objects:
 #' \itemize{
 #' \item "norm_count": a cell-by-bin normalized read count matrix.
 #' \item "baseline": a vector. Read count baseline of normal cells.
-#' \item "copy_ratio": a cell-by-bin copy ratio matrix without segmentation.
+#' \item "copy_ratio": a cell-by-bin copy ratio matrix before segmentation.
 #' }
 #' @export
 #'
 #' @examples
 #'
-normalize <- function(count, genome="hg38", mode="normal cells",
-                      thre_bin=0.8, thre_cell=1, thre_mappability=500000,
+normalize <- function(count, genome="hg38",
+                      mode="normal cells",
+                      thre_bin=0.8, thre_cell=1,
+                      thre_mappability=500000,
                       logFT=F, dlm_dV=0.3, dlm_dW=0.01,
                       count_paired="none",
                       normal_cells="none",
-                      cell_cluster="none", cluster_method="kmeans", K=5,
-                      thre_correlation=0.95, use_max_cor_cluster=F, thre_ncell=30,
+                      cell_cluster="none",
+                      cluster_method="kmeans", K=5,
+                      thre_correlation=0.95,
+                      use_max_cor_cluster=F,
+                      thre_ncell=30,
                       cutoff=3,
+                      gc_correction=TRUE,
                       output_dir="./",
-                      output_name="norm_result.rds"){
+                      output_name="none"){
   count <- t(count)
   if(genome=="hg19"){
     data("bin_info_hg19")
@@ -290,7 +299,7 @@ normalize <- function(count, genome="hg38", mode="normal cells",
   }
 
   ## Step 4: normalize using baseline
-  print("Step 4: normalizing...")
+  print("Step 4: normalizing against baseline...")
   norm_count_final <- norm_count-baseline$selected_normal
   norm_count_final <- t(norm_count_final)
   norm_count_final <- exp(norm_count_final)
@@ -305,16 +314,39 @@ normalize <- function(count, genome="hg38", mode="normal cells",
   norm_count_final[norm_count_final>thre1] <- thre1
   colnames(norm_count_final) <- paste0(bin$chr,"_",bin$start,"_",bin$end)[f1]
 
-  ## Step 5: save results
+  ## Step 5: GC correction
+  print("Step 5: GC correction...")
+  norm_count <- t(exp(norm_count))
+  colnames(norm_count) <- colnames(norm_count_final)
+  norm_re <- list(copy_ratio=norm_count_final,
+                  norm_count=norm_count,
+                  baseline=exp(baseline$selected_normal))
+
+  tmp <- data.frame(y = norm_re$baseline, gc = bin$gc[f1])
+  loess_re <- loess(data = tmp, formula = y ~ gc)
+  baseline_gc <- loess_re$fitted
+  gc_corrected_cell <- function(y){
+    tmp <- data.frame(y = y, gc = bin$gc[f1])
+    loess_re <- loess(data = tmp, formula = y ~ gc)
+    y_gc <- loess_re$fitted
+    baseline_gc_corrected <- y_gc * norm_re$baseline / baseline_gc
+    return(baseline_gc_corrected)
+  }
+
+  if(gc_correction){
+    baseline_new <- apply(norm_re$norm_count, 1, gc_corrected_cell)
+    # print(dim(baseline_new))
+    norm_re$baseline <- t(baseline_new)
+    norm_re$copy_ratio <- norm_re$norm_count / norm_re$baseline
+  }
+
+  ## Step 6: save results
+  print("Step 6: saving results...")
   if(!dir.exists(output_dir)){
     dir.create(output_dir)
   }
-  norm_count <- t(exp(norm_count))
-  print("Step 5: saving results...")
-  colnames(norm_count) <- colnames(norm_count_final)
-  result <- list(copy_ratio=norm_count_final,
-                 norm_count=norm_count,
-                 baseline=exp(baseline$selected_normal))
-  saveRDS(result, paste0(output_dir, output_name))
-  return(result)
+  if(output_name != "none"){
+    saveRDS(norm_re, paste0(output_dir, output_name))
+  }
+  return(norm_re)
 }

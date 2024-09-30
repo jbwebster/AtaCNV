@@ -27,6 +27,3 @@ a cell-by-bin read count matrix
 \description{
 Generate input matrix from fragment file for AtaCNV pipeline
 }
-\examples{
-
-}
