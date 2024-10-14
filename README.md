@@ -1,5 +1,5 @@
 # AtaCNV
-This is the R package implementation for AtaCNV, a CNV detection algorithm for scATAC-seq datasets The method is presented in paper "Detecting copy number variations from single-cell chromatin accessibility sequencing data by AtaCNV". 
+This is the R package implementation for AtaCNV, a CNV detection algorithm for scATAC-seq datasets. The method is presented in paper "Detecting copy number variations from single-cell chromatin accessibility sequencing data by AtaCNV". 
 
 # Workflow
 
