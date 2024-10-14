@@ -16,7 +16,7 @@ devtools::install_github("Aelita-Stone/AtaCNV")
 # Usage
 Based on the workflow, the R package primarily includes three modules: normalization, segmentation, and copy number state inference.
 
-## Normalization
+### Normalization
 Using count matrix as input, AtaCNV removes confounding factors like GC content to deconvolute CNV signals.
 ```
 norm_re <- AtaCNV::normalize(count,
@@ -29,7 +29,7 @@ norm_re <- AtaCNV::normalize(count,
                              )
 ```
 
-## Segmentation
+### Segmentation
 AtaCNV utilizes BICseq to infer potential breakpoints and calculate segment-wise copy ratios.
 ```
 seg_re <- AtaCNV::calculate_CNV(norm_count = norm_re$norm_count,
@@ -38,7 +38,7 @@ seg_re <- AtaCNV::calculate_CNV(norm_count = norm_re$norm_count,
                                 output_name = "CNV_re.rds")
 ```
 
-## Copy state inference
+### Copy state inference
 For tumor cells, AtaCNV further infers their discrete copy number states.
 ```
 CN_state <- AtaCNV::estimate_cnv_state_cluster(count = count,
