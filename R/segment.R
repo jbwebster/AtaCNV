@@ -40,6 +40,7 @@ calculate_CNV <- function(norm_count,
       BICseq <- system.file("BICseq2", "mbic-seq.exe", package="AtaCNV")
     }else if(Sys.info()["sysname"]=="Linux"){
       BICseq <- system.file("BICseq2", "MBICseq", package="AtaCNV")
+      Sys.chmod(BICseq, mode = "0755")
     }
 
   }
