@@ -54,7 +54,7 @@ calculate_CNV <- function(norm_count,
   chr_bkp <- bin2chrbkp(bins)
 
   ## find breakpoints
-  print("Step 1: running BICseq2 for segmentation...")
+  print("Running BICseq2 for segmentation...")
   bkp <- c()
   lambda <- lambda
   tmp_dir <- output_dir
@@ -133,7 +133,7 @@ calculate_CNV <- function(norm_count,
   }
 
   ## save results
-  print("Step 2: saving results...")
+  print("Saving results...")
   CNV <- round(CNV, digit = 3)
   result <- list(copy_ratio = CNV,
                  bkp = bkp,
@@ -148,7 +148,7 @@ calculate_CNV <- function(norm_count,
 #' \code{normalize()}.
 #' @param baseline read count baseline of normal cells. Obtained from previous step
 #' \code{normalize()}.
-#' @param genome reference genome, "hg19" or "hg38".
+#' @param genome reference genome, "hg19", "hg38" or "mm10".
 #' @param min_interval minimum bin number between breakpoints.
 #' @param smooth logical. Whether to aggregate similar cells to smooth final CNV
 #' results?
@@ -177,14 +177,19 @@ calculate_CNV_arm_level <- function(norm_count,
   bins <- str2bin(colnames(norm_count))
   chr_list <- unique(bins$chr)
   if(genome=="hg19"){
-    data("chr_length_hg19")
-    chr_arm <- chr_length_hg19
+    data("bin_info_hg19")
+    bin <- bin_info_hg19
   }else if(genome=="hg38"){
-    data("chr_length_hg38")
-    chr_arm <- chr_length_hg38
+    data("bin_info_hg38")
+    bin <- bin_info_hg38
+  }else if(genome=="mm10"){
+    data("bin_info_mm10")
+    bin <- bin_info_mm10
+  }else{
+    print("Genome should be one of {hg19, hg38, mm10}.")
   }
-  f <- chr_arm$arm %in% c("p","q")
-  chr_arm <- chr_arm[f, ]
+  f <- bin$arm %in% c("p","q")
+  chr_arm <- bin[f, ]
   chr_arm$n <- 1:nrow(chr_arm)
 
   CNV_re <- matrix(1, nrow=nrow(norm_count), ncol=nrow(chr_arm))
@@ -192,11 +197,15 @@ calculate_CNV_arm_level <- function(norm_count,
   colnames(CNV_re) <- bin2str(chr_arm)
 
   ## calculate CNV
+  bkp <- c(0)
   for(j in chr_list){
     for(arm_ in c("p","q")){
       f <- chr_arm$chr==j & chr_arm$arm==arm_
       f1 <- bins$chr==j & bins$start %in% chr_arm$start[f]
-      if(sum(f1)>min_interval){
+      if(sum(f1) > 0){
+        bkp <- c(bkp, bkp[length(bkp)] + sum(f1))
+      }
+      if(sum(f1) > min_interval){
         if(sum(f1)==1){
           CNV_re[, f] <- mean(norm_count[, f1])/mean(baseline[f1])
         }else{
@@ -206,12 +215,6 @@ calculate_CNV_arm_level <- function(norm_count,
         }
       }
     }
-  }
-
-  bkp <- rep(0, 2*length(chr_list)+1)
-  for(i in 1:length(chr_list)){
-    bkp[2*i] <- max(chr_arm$n[chr_arm$chr==chr_list[i]&chr_arm$arm=="p"])
-    bkp[2*i+1] <- max(chr_arm$n[chr_arm$chr==chr_list[i]&chr_arm$arm=="q"])
   }
 
   ## smooth using similar cells

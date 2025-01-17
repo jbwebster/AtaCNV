@@ -13,7 +13,7 @@ CNV_score <- function(copy_ratio, cluster, delXY=T){
   S <- c(1:length(cluster))
   m <- 1
   if(delXY){
-    bin <- str2bin(colnames(CNV))
+    bin <- str2bin(colnames(copy_ratio))
     copy_ratio <- copy_ratio[,!bin$chr %in% c("chrX","chrY")]
   }
   for(i in unique(cluster)){
@@ -23,7 +23,7 @@ CNV_score <- function(copy_ratio, cluster, delXY=T){
     S[f] <- s
     print(paste0("cluster ",i,": ",sum(f),"cells ","score=",s))
   }
-  return(S)
+  # return(S)
 }
 
 #' Plot CNV heatmap using ComplexHeatmap

@@ -32,7 +32,7 @@ normalize(
 \item{count}{a cell-by-bin read count matrix. Column names should be formatted (see
 example data).}
 
-\item{genome}{reference genome, "hg19" or "hg38".}
+\item{genome}{reference genome, "hg19", "hg38" or "mm10".}
 
 \item{mode}{a string indicating how to obtain baseline counts of each bin.
 One of:

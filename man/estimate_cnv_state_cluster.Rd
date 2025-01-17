@@ -9,7 +9,7 @@ estimate_cnv_state_cluster(count, genome, copy_ratio, bkp, label, n_iter = 2)
 \arguments{
 \item{count}{the raw cell-by-bin read count matrix.}
 
-\item{genome}{reference genome, "hg19" or "hg38".}
+\item{genome}{reference genome, "hg19", "hg38" or "mm10".}
 
 \item{copy_ratio}{the estimated copy ratio matrix from \code{normalize()}.}
 

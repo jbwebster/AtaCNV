@@ -3,7 +3,7 @@
 #' @param fragment_file path of fragment file.
 #' @param cell_barcodes a string vector giving barcodes that represent cells in
 #' scATAC-seq expriment.
-#' @param genome reference genome, "hg19" or "hg38".
+#' @param genome reference genome, "hg19", "hg38" or "mm10".
 #' @param output_dir output directory
 #'
 #' @return a cell-by-bin read count matrix
@@ -11,36 +11,34 @@
 #'
 #' @examples
 #'
-generate_input <- function(fragment_file, cell_barcodes, genome="hg38",
+generate_input <- function(fragment_file,
+                           cell_barcodes,
+                           genome="hg38",
                            output_dir="./"){
   if(genome=="hg19"){
-    data("chr_length_hg19")
-    chr_info <- chr_length_hg19
+    data("bin_info_hg19")
+    bin <- bin_info_hg19
   }else if(genome=="hg38"){
-    data("chr_length_hg38")
-    chr_info <- chr_length_hg38
+    data("bin_info_hg38")
+    bin <- bin_info_hg38
+  }else if(genome=="mm10"){
+    data("bin_info_mm10")
+    bin <- bin_info_mm10
+  }else{
+    print("Genome should be one of {hg19, hg38, mm10}.")
   }
   print(paste0("Reference genome: ", genome))
-  chr_list <- chr_info$chrom
-  chr_length <- chr_info$size
+  chr_list <- unique(bin$chr)
+  chr_length <- rep(0, length(chr_list))
+  for(i in 1:length(chr_list)){
+    chr_length[i] <- max(bin$end[bin$chr==chr_list[i]])
+  }
   barcode <- cell_barcodes
   K <- 1000000
 
-  start <- c()
-  end <- c()
-  chr <- c()
-  for(i in 1:length(chr_list)){
-    n <- floor(chr_length[i]/K)
-    temp <- K*c(0:n)
-    temp <- c(temp, chr_length[i])
-    start <- c(start, temp[1:(n+1)])
-    end <- c(end, temp[2:(n+2)])
-    chr <- c(chr, rep(chr_list[i], n+1))
-  }
-  bin <- data.frame(chr, start, end)
-
-  count <- matrix(data=0, nrow=length(barcode), ncol=length(start))
-  row.names(count) <- barcode
+  count <- matrix(data=0, nrow=length(barcode), ncol=nrow(bin))
+  rownames(count) <- barcode
+  colnames(count) <- bin2str(bin)
 
   t1 <- proc.time()
   # con <- file(fragment_file, "r")
@@ -61,19 +59,17 @@ generate_input <- function(fragment_file, cell_barcodes, genome="hg38",
     if(!(cell_barcode %in% barcode) | !(temp[1]) %in% chr_list){
       next
     }
-    if(temp[1]!=chr_list[nchr]){
+    if(temp[1] != chr_list[nchr]){
       print(paste(chr_list[nchr], "finished"))
-      nchr_start <- nchr_start+floor(chr_length[nchr]/K)+1
+      nchr_start <- nchr_start + floor(chr_length[nchr]/K)+1
       nchr <- nchr+1
       if(nchr > length(chr_list)){
         break
       }
     }
     pos <- as.numeric(temp[2])
-    # count[cell_barcode, nchr_start+floor(pos/K)+1] <-
-    #   count[cell_barcode, nchr_start+floor(pos/K)+1]+1
     count[cell_barcode, nchr_start+floor(pos/K)+1] <-
-      count[cell_barcode, nchr_start+floor(pos/K)+1]+as.numeric(temp[5])
+      count[cell_barcode, nchr_start+floor(pos/K)+1] + as.numeric(temp[5])
   }
   close(con)
   t2 <- proc.time()
@@ -83,5 +79,5 @@ generate_input <- function(fragment_file, cell_barcodes, genome="hg38",
   if(!dir.exists(output_dir)){
     dir.create(output_dir)
   }
-  saveRDS(count,file=paste0(output_dir,"input.rds"))
+  saveRDS(count,file=paste0(output_dir, "count.rds"))
 }

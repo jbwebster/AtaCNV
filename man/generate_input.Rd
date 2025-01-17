@@ -17,7 +17,7 @@ generate_input(
 \item{cell_barcodes}{a string vector giving barcodes that represent cells in
 scATAC-seq expriment.}
 
-\item{genome}{reference genome, "hg19" or "hg38".}
+\item{genome}{reference genome, "hg19", "hg38" or "mm10".}
 
 \item{output_dir}{output directory}
 }

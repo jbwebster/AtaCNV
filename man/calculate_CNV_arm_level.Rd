@@ -21,7 +21,7 @@ calculate_CNV_arm_level(
 \item{baseline}{read count baseline of normal cells. Obtained from previous step
 \code{normalize()}.}
 
-\item{genome}{reference genome, "hg19" or "hg38".}
+\item{genome}{reference genome, "hg19", "hg38" or "mm10".}
 
 \item{min_interval}{minimum bin number between breakpoints.}
 

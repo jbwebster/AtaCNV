@@ -2,7 +2,7 @@
 #'
 #' @param count a cell-by-bin read count matrix. Column names should be formatted (see
 #' example data).
-#' @param genome reference genome, "hg19" or "hg38".
+#' @param genome reference genome, "hg19", "hg38" or "mm10".
 #' @param mode a string indicating how to obtain baseline counts of each bin.
 #' One of:
 #' \itemize{
@@ -83,6 +83,9 @@ normalize <- function(count, genome="hg38",
   }else if(genome=="hg38"){
     data("bin_info_hg38")
     bin <- bin_info_hg38
+  }else if(genome=="mm10"){
+    data("bin_info_mm10")
+    bin <- bin_info_mm10
   }
   use_paired <- F
   if(mode=="matched normal sample"){
@@ -103,7 +106,7 @@ normalize <- function(count, genome="hg38",
   if(use_paired){
     norm_count <- cbind(count_paired, norm_count)
     thre_zero_bin <- thre_bin # bins with more 0 than thre will be discarded
-    temp <- rowSums(norm_count<=0)
+    temp <- rowSums(norm_count <= 0)
     f1 <- temp<thre_zero_bin*dim(norm_count)[2] & bin$map>=thre_mappability
     print(paste(" number of bin before filter:", length(f1)))
     print(paste(" number of bin after filter:", sum(f1)))
@@ -111,7 +114,7 @@ normalize <- function(count, genome="hg38",
     q <- quantile(norm_count, probs=c(1:100)*0.01)
     # print(q)
     thre <- q[99]
-    norm_count[norm_count>thre] <- thre
+    norm_count[norm_count > thre] <- thre
 
     thre_zero_cell <- thre_cell # cells with more 0/1 than thre will be discarded
     temp <- colSums(norm_count[, (ncol(count_paired)+1):ncol(norm_count)]<=0)
@@ -121,7 +124,7 @@ normalize <- function(count, genome="hg38",
     norm_count <- cbind(count_paired[f1,], count[f1,f2])
   }else{
     thre_zero_bin <- thre_bin # bins with more 0 than thre will be discarded
-    temp <- rowSums(norm_count<=0)
+    temp <- rowSums(norm_count <= 0)
     f1 <- temp<thre_zero_bin*dim(norm_count)[2] & bin$map>=thre_mappability
     print(paste(" number of bin before filter:", length(f1)))
     print(paste(" number of bin after filter:", sum(f1)))
@@ -132,11 +135,11 @@ normalize <- function(count, genome="hg38",
     norm_count[norm_count>thre] <- thre
 
     thre_zero_cell <- thre_cell # cells with more 0 than thre will be discarded
-    temp <- colSums(norm_count<=0)
+    temp <- colSums(norm_count <= 0)
     f2 <- temp<thre_zero_cell*nrow(norm_count)
     print(paste(" number of cells before filter:", length(f2)))
     print(paste(" number of cells after filter:", sum(f2)))
-    norm_count <- count[f1,f2]
+    norm_count <- count[f1, f2]
   }
 
   if(!identical(normal_cells, "none")){

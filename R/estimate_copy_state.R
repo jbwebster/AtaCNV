@@ -105,7 +105,6 @@ sim_count_given_CNV <- function(ref_count,
 #'
 #' @param count
 #' @param genome
-#' @param chr_arm
 #' @param bin
 #' @param n_cnv
 #' @param n_state
@@ -116,25 +115,29 @@ sim_count_given_CNV <- function(ref_count,
 #' @examples
 #' @noRd
 estimate_cnv_state_paramater <- function(count, genome,
-                                         chr_arm, bin,
+                                         bin,
                                          n_cnv=10, n_state=3,
                                          random_seed = 1234){
   # count: cell * bin
   set.seed(random_seed)
   count <- as(count, "dgCMatrix")
+  f <- bin$arm %in% c("p", "q")
+  chr_arm <- data.frame(chr=unique(paste0(bin$chr, bin$arm)[f]),
+                        start=0, end=0)
   chr_arm$map_bin <- 0
-  for(i in 1:44){
-    chr_ <- paste0("chr",ceiling(i/2))
-    arm_ <- "q"
-    if(i%%2==1){arm_ <- "p"}
-    chr_arm$map_bin[i] <- sum(bin$chr==chr_ & bin$arm==arm_
-                              & bin$map>500000)
+  bin$n <- 1:nrow(bin)
+  for(i in 1:nrow(chr_arm)){
+    f <- paste0(bin$chr, bin$arm) == chr_arm$chr[i]
+    bin_ <- bin[f,]
+    chr_arm$start[i] <- min(bin_$n)
+    chr_arm$end[i] <- max(bin_$n)
+    chr_arm$map_bin[i] <- sum(bin_$map > 500000)
   }
   chr_arm$len <- chr_arm$end - chr_arm$start + 1
   chr_arm <- chr_arm[chr_arm$map_bin>10,]
 
   ncell <- 500
-  print(n_state)
+  # print(n_state)
   if(n_state == 3){
     CNV_candidates <- c(1,3)
   }else if(n_state == 5){
@@ -187,7 +190,7 @@ estimate_cnv_state_paramater <- function(count, genome,
 #' Estimate copy number
 #'
 #' @param count the raw cell-by-bin read count matrix.
-#' @param genome reference genome, "hg19" or "hg38".
+#' @param genome reference genome, "hg19", "hg38" or "mm10".
 #' @param copy_ratio the estimated copy ratio matrix from \code{normalize()}.
 #' @param bkp the detected breakpoint positions from \code{calculate_CNV()}.
 #' @param label a vector indicating normal cell and tumor subclone. Its length
@@ -218,19 +221,17 @@ estimate_cnv_state_cluster <- function(count,
   if(genome=="hg19"){
     data("bin_info_hg19")
     bin <- bin_info_hg19
-    data("chr_arm_hg19")
-    chr_arm <- chr_arm_hg19
   }else if(genome=="hg38"){
     data("bin_info_hg38")
     bin <- bin_info_hg38
-    data("chr_arm_hg38")
-    chr_arm <- chr_arm_hg38
+  }else if(genome=="mm10"){
+    data("bin_info_mm10")
+    bin <- bin_info_mm10
   }
   n_state <- 3
   print("Estimating copy ratio distribution...")
   tmp <- estimate_cnv_state_paramater(count = count[f,],
                                       genome = genome,
-                                      chr_arm = chr_arm,
                                       bin = bin,
                                       n_state = n_state)
   mu <- tmp[[1]]
