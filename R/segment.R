@@ -86,6 +86,9 @@ calculate_CNV <- function(norm_count,
       paste0(rownames(norm_count_),"_ref")
     colnames(bic_input) <- s
 
+    #Confirm that bic_input has no negative numbers
+    bic_input[bic_input<0] <- 0
+
     write.table(x=bic_input, file=paste0(tmp_dir, i, ".bin"),
                 quote=F, sep="\t",
                 row.names=F, col.names=T, append=F)
