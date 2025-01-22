@@ -137,7 +137,7 @@ plot_heatmap <- function(copy_ratio,
   #b <- ComplexHeatmap::HeatmapAnnotation(
   #  chr=bins$chr, col=list(chr=temp), which="column", show_annotation_name=F)
   b <- ComplexHeatmap::HeatmapAnnotation(
-    foo = anno_black(gp = gpar(fill = anno.colors),
+    foo = anno_block(gp = gpar(fill = anno.colors),
                      labels = unique(gsub("chr","",bins$chr)),
                      labels_gp = gpar(col="black", fontsize=12))
   )
