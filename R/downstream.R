@@ -139,7 +139,7 @@ plot_heatmap <- function(copy_ratio,
   b <- ComplexHeatmap::HeatmapAnnotation(
     foo = ComplexHeatmap::anno_block(gp = gpar(fill = anno.colors),
                      labels = unique(gsub("chr","",bins$chr)),
-                     labels_gp = gpar(col="black", fontsize=12))
+                     labels_gp = grid::gpar(col="black", fontsize=12))
   )
 
   #Split columns by chromosomes for clarity
