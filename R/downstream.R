@@ -26,6 +26,7 @@ CNV_score <- function(copy_ratio, cluster, delXY=T){
   # return(S)
 }
 
+
 #' Plot CNV heatmap using ComplexHeatmap
 #'
 #' @param copy_ratio a cell-by-bin copy ratio matrix. Column names should be
@@ -41,6 +42,7 @@ CNV_score <- function(copy_ratio, cluster, delXY=T){
 #' @param save_hc logical, whether to save hierarchical clustering result?
 #' @param add_noise logical. If TRUE, add random noise to copy ratio to
 #' avoid clustering error.
+#' @param seed numeric. Used to ensure consistent clustering
 #' @param output_dir output directory
 #' @param output_name output image name, should be ".png" or ".pdf"
 #'
@@ -56,9 +58,11 @@ plot_heatmap <- function(copy_ratio,
                          cell_annotation="none",
                          save_hc=F,
                          add_noise=T,
+                         seed=42,
                          output_dir="./",
                          output_name="copy_ratio.png"
 ){
+  set.seed(seed)
   if(!dir.exists(output_dir)){
     dir.create(output_dir)
   }
@@ -132,9 +136,17 @@ plot_heatmap <- function(copy_ratio,
   n_chr <- length(unique(bins$chr))
   temp <- rep("gray",n_chr)
   temp[2*c(1:floor(n_chr/2))] <- "white"
-  names(temp) <- unique(bins$chr)
+  #names(temp) <- unique(bins$chr)
+  #b <- ComplexHeatmap::HeatmapAnnotation(
+  #  chr=bins$chr, col=list(chr=temp), which="column", show_annotation_name=F)
   b <- ComplexHeatmap::HeatmapAnnotation(
-    chr=bins$chr, col=list(chr=temp), which="column", show_annotation_name=F)
+    foo = anno_black(gp = gpar(fill = anno.colors),
+                     labels = unique(gsub("chr","",bins$chr)),
+                     labels_gp = gpar(col="black", fontsize=12))
+  )
+
+  #Split columns by chromosomes for clarity
+  col.split <- factor(bins$chr,levels=unique(bins$chr))
 
   ## heatmap
   # ComplexHeatmap::ht_opt$message <- FALSE
@@ -143,26 +155,21 @@ plot_heatmap <- function(copy_ratio,
                 cluster_rows=hc_re, cluster_columns=FALSE,
                 show_row_names=FALSE, show_column_names=FALSE,
                 split=K,
+                show_row_dend = FALSE,
+                column_split = col.split,
+                column_title = NULL,
+                cluster_column_slices = FALSE,
+                show_column_dend = FALSE,
                 left_annotation=a, top_annotation=b,
                 use_raster=T)
 
-  ## add vertical lines
-  k <- K
+
   if(substr(save_dir, nchar(save_dir)-2, nchar(save_dir))=="png"){
     png(filename=save_dir, width=2000, height=1000)
   }else{
     pdf(file=save_dir, width=20, height=10)
   }
   print(ht)
-  for(i in 1:k){
-    for(j in chr_bkp){
-      ComplexHeatmap::decorate_heatmap_body(
-        "copy ratio",
-        {grid::grid.lines(c(j/dim(plot_data)[2], j/dim(plot_data)[2]),
-                    c(0,1), gp=grid::gpar(lty=1, lwd=2))},
-        slice=i)
-      }
-  }
   dev.off()
 
   ## save cluster result
