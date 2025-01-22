@@ -42,7 +42,6 @@ CNV_score <- function(copy_ratio, cluster, delXY=T){
 #' @param save_hc logical, whether to save hierarchical clustering result?
 #' @param add_noise logical. If TRUE, add random noise to copy ratio to
 #' avoid clustering error.
-#' @param seed numeric. Used to ensure consistent clustering
 #' @param output_dir output directory
 #' @param output_name output image name, should be ".png" or ".pdf"
 #'
@@ -58,11 +57,9 @@ plot_heatmap <- function(copy_ratio,
                          cell_annotation="none",
                          save_hc=F,
                          add_noise=T,
-                         seed=42,
                          output_dir="./",
                          output_name="copy_ratio.png"
 ){
-  set.seed(seed)
   if(!dir.exists(output_dir)){
     dir.create(output_dir)
   }
